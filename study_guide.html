@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Planner - Project Flow & MERN Stack Q&A Guide</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #273043;
+            background-color: #ffffff;
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.4rem;
+            color: #1a2a3a;
+            border-bottom: 2px solid #e4eaf2;
+            padding-bottom: 12px;
+            margin-bottom: 30px;
+            font-weight: 800;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: #2d6568;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-bottom: 1px dashed #d8e0ea;
+            padding-bottom: 8px;
+            font-weight: 700;
+        }
+
+        h3 {
+            font-size: 1.15rem;
+            color: #273043;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        p, li {
+            font-size: 0.98rem;
+            color: #4a5568;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        /* Q&A Section Styling */
+        .qa-card {
+            background-color: #f8fafc;
+            border-left: 4px solid #5d8a8b;
+            border-radius: 6px;
+            padding: 22px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.01);
+            border-top: 1px solid #edf2f7;
+            border-right: 1px solid #edf2f7;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .question {
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 12px;
+            font-size: 1.08rem;
+        }
+
+        .answer {
+            color: #4a5568;
+        }
+
+        .answer strong {
+            color: #2d6568;
+        }
+
+        code {
+            font-family: Consolas, Monaco, monospace;
+            background-color: #edf2f7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #2d3748;
+        }
+
+        pre {
+            background-color: #1a202c;
+            color: #f7fafc;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 0.88rem;
+            line-height: 1.4;
+        }
+
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+        }
+
+        /* Print adjustments */
+        @media print {
+            body {
+                padding: 20px;
+                background-color: white;
+            }
+            .qa-card {
+                page-break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #e2e8f0;
+                border-left: 4px solid #5d8a8b;
+                background-color: #f8fafc !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            pre {
+                page-break-inside: avoid;
+            }
+            h2, h3 {
+                page-break-after: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Study Planner - Project Flow & MERN Stack Q&A</h1>
+        
+        <p>This document details the architecture and database relations of your Study Planner MERN application, followed by common viva/interview questions with answers.</p>
+
+        <h2>1. Step-by-Step Project Flow</h2>
+        <p>Here is how requests flow through your application during typical user operations:</p>
+        
+        <ul>
+            <li><strong>User Login Flow:</strong>
+                <ul>
+                    <li>The user enters credentials on the frontend page and clicks "Sign In".</li>
+                    <li>The React application makes an HTTP POST request to the backend server at <code>/api/auth/login</code>.</li>
+                    <li>The Express backend queries MongoDB to retrieve the User document matching the email.</li>
+                    <li>If found, it compares the submitted password with the hashed password stored in the database using <code>bcryptjs</code>.</li>
+                    <li>If matched, it signs a JSON Web Token (JWT) with the backend <code>JWT_SECRET</code> and sends it, along with user details, back to the browser.</li>
+                    <li>The React frontend stores the token in <code>localStorage</code>, updates the <code>AuthContext</code>, and redirects the user to the Dashboard.</li>
+                </ul>
+            </li>
+            <li><strong>Fetching User Tasks:</strong>
+                <ul>
+                    <li>The Dashboard component mounts and triggers a GET request to <code>/tasks</code>.</li>
+                    <li>A global Axios request interceptor in <code>api.js</code> catches this outgoing request and automatically appends the user's JWT token to the request headers.</li>
+                    <li>The backend <code>auth</code> middleware extracts the token, verifies its integrity, decodes the payload, and sets the user's ID to <code>req.user.id</code>.</li>
+                    <li>The task router queries MongoDB using <code>Task.find({ user: req.user.id })</code>.</li>
+                    <li>MongoDB returns only the tasks belonging to that specific user ID, ensuring data isolation.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h2>2. Core MERN Stack Q&A</h2>
+
+        <div class="qa-card">
+            <div class="question">Q1: What does MERN stand for?</div>
+            <div class="answer">
+                <strong>M</strong>ongoDB: A NoSQL Document Database used to store application data in BSON format.<br>
+                <strong>E</strong>xpress.js: A minimal and flexible Node.js web application framework used to build backend REST APIs.<br>
+                <strong>R</strong>eact.js: A frontend JavaScript library used for building dynamic, interactive user interfaces.<br>
+                <strong>N</strong>ode.js: A JavaScript runtime environment that executes JavaScript code outside a web browser (on the server).
+            </div>
+        </div>
+
+        <div class="qa-card">
+            <div class="question">Q2: What is the difference between SQL and NoSQL databases, and why do we use MongoDB?</div>
+            <div class="answer">
+                <strong>SQL Databases</strong> (like MySQL, PostgreSQL) are relational, table-based, and require a strict, predefined schema. 
+                <strong>NoSQL Databases</strong> (like MongoDB) are non-relational, document-based, and schema-less.
+                <br><br>
+                <strong>Why MongoDB?</strong> MongoDB stores data in flexible JSON-like documents, which map naturally to JavaScript objects in a MERN stack. It handles unstructured data easily, scales horizontally, and makes rapid prototyping much faster.
+            </div>
+        </div>
+
+        <div class="qa-card">
+            <div class="question">Q3: What is Mongoose and why is it used instead of raw MongoDB queries?</div>
+            <div class="answer">
+                Mongoose is an <strong>ODM</strong> (Object Document Mapper) library for MongoDB and Node.js. It is used because:
+                <ul>
+                    <li>It defines structural schemas for collections (types, defaults, validators).</li>
+                    <li>It provides built-in validation (e.g., making fields <code>required</code> or setting <code>enum</code> choices).</li>
+                    <li>It simplifies query building and establishes model relationships (like matching a Task to a User).</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="qa-card">
+            <div class="question">Q4: What is JWT (JSON Web Token) and how does it work in session management?</div>
+            <div class="answer">
+                JWT is an open standard used to securely transmit information between parties as a JSON object.
+                <ul>
+                    <li><strong>Structure:</strong> It has three parts separated by dots: <code>Header.Payload.Signature</code>.</li>
+                    <li><strong>How it works:</strong> When a user logs in, the server generates a token signed with a private secret key. The client receives this token and stores it. For subsequent requests, the client sends this token. The server verifies the signature to validate the session.</li>
+                    <li><strong>Benefit:</strong> It is stateless, meaning the server doesn't need to keep session records in memory, making the application easily scalable.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="qa-card">
+            <div class="question">Q5: What is CORS (Cross-Origin Resource Sharing) and why is it needed?</div>
+            <div class="answer">
+                CORS is a browser security mechanism that restricts resources on a web page from being requested from another domain outside the domain from which the first resource was served.
+                <br><br>
+                <strong>Why needed:</strong> Our React app runs on port <code>5173</code> (origin A) and tries to request resources from our Express server on port <code>5000</code> (origin B). Without configuring the <code>cors</code> middleware in Express, the browser would block this request to prevent malicious cross-origin data theft.
+            </div>
+        </div>
+
+        <h2>3. Project-Specific Q&A</h2>
+
+        <div class="qa-card">
+            <div class="question">Q1: How did you implement the User-Task relationship in the database?</div>
+            <div class="answer">
+                Inside <code>models/Task.js</code>, we added a <code>user</code> field that stores the MongoDB <code>ObjectId</code> of the User who created it:
+                <pre><code>user: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "User",
+  required: true
+}</code></pre>
+                In <code>routes/taskRoutes.js</code>, when a task is created, we assign <code>user: req.user.id</code>, and when fetching tasks, we query <code>Task.find({ user: req.user.id })</code>.
+            </div>
+        </div>
+
+        <div class="qa-card">
+            <div class="question">Q2: What is the purpose of the Axios Request Interceptor in api.js?</div>
+            <div class="answer">
+                Instead of manually reading the token and appending auth headers to every single API request in all our components, we configured a central interceptor in <code>src/api.js</code>:
+                <pre><code>api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers["x-auth-token"] = token;
+    config.headers["Authorization"] = `Bearer ${token}`;
+  }
+  return config;
+});</code></pre>
+                This automatically secures every HTTP request sent through our <code>api</code> client without code repetition.
+            </div>
+        </div>
+
+        <div class="qa-card">
+            <div class="question">Q3: Why did you remove Tailwind CSS and how is the styling managed now?</div>
+            <div class="answer">
+                <strong>Why removed:</strong> The original planner pages used custom Vanilla CSS styles defined in <code>style.css</code>, whereas the authentication page templates were using Tailwind CSS utility classes. Since Tailwind was not configured or compiled in the project, the pages looked completely unstyled.
+                <br><br>
+                <strong>How managed:</strong> We migrated all pages to use the existing styles in <code>style.css</code>. This kept the design consistent, avoided installing unnecessary npm packages, reduced file size, and maintained a premium look.
+            </div>
+        </div>
+
+        <div class="qa-card">
+            <div class="question">Q4: How does Protected Routing work in the frontend?</div>
+            <div class="answer">
+                We created a custom component called <code>ProtectedRoute</code> in <code>App.jsx</code>.
+                <ul>
+                    <li>It reads <code>user</code> and <code>loading</code> states from <code>AuthContext</code>.</li>
+                    <li>If the session is still loading, it shows a loading message.</li>
+                    <li>If <code>user</code> is null (not logged in), it redirects the browser to <code>/login</code> using React Router's <code>&lt;Navigate to="/login" replace /&gt;</code>.</li>
+                    <li>If the user is logged in, it allows the rendering of the child pages (<code>Dashboard</code>, <code>Planner</code>, <code>AllTasks</code>).</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="qa-card">
+            <div class="question">Q5: What was the cause of the React is not defined error and how was it fixed?</div>
+            <div class="answer">
+                <strong>Cause:</strong> Some files returned JSX elements but did not import the <code>React</code> library. In certain bundlers or dev servers, JSX tags compile to <code>React.createElement(...)</code>. Since <code>React</code> was not in scope, the browser console threw a ReferenceError, rendering a blank screen.
+                <br><br>
+                <strong>Fix:</strong> Added <code>import React from 'react';</code> to the top of <code>AuthContext.jsx</code>, <code>Login.jsx</code>, <code>Register.jsx</code>, and <code>Dashboard.jsx</code>.
+            </div>
+        </div>
+    </div>
+</body>
+</html>
