@@ -1,19 +1,2 @@
-import React from "react";
-import TaskManager from "../components/TaskManager.jsx";
-
-const Planner = () => {
-  return (
-    <>
-      <section className="app-header">
-        <h1>Study Planner</h1>
-        <p className="subtitle">Add, view, edit, and delete your study tasks in one simple place.</p>
-      </section>
-
-      <div className="single-panel">
-        <TaskManager view="form" />
-      </div>
-    </>
-  );
-};
-
-export default Planner;
+import React,{useEffect,useMemo,useState}from"react";import TaskManager from"../components/TaskManager";import api from"../api";import{formatDate}from"../taskUtils";
+const Planner=()=>{const[month,setMonth]=useState(new Date(new Date().getFullYear(),new Date().getMonth(),1)),[tasks,setTasks]=useState([]),[selected,setSelected]=useState(null);useEffect(()=>{api.get("/tasks").then(r=>setTasks(r.data)).catch(()=>{})},[]);const cells=useMemo(()=>{const start=new Date(month.getFullYear(),month.getMonth(),1), offset=start.getDay(),days=new Date(month.getFullYear(),month.getMonth()+1,0).getDate();return Array.from({length:offset+days},(_,i)=>i<offset?null:i-offset+1)},[month]);const taskForDay=d=>tasks.filter(t=>t.dueDate&&new Date(t.dueDate).getFullYear()===month.getFullYear()&&new Date(t.dueDate).getMonth()===month.getMonth()&&new Date(t.dueDate).getDate()===d);return <><section className="app-header left-header"><p className="eyebrow">Academic planner</p><h1>Study Planner</h1><p className="subtitle">Add study tasks and view deadlines in a monthly calendar.</p></section><TaskManager/><section className="card calendar"><div className="calendar-header"><button onClick={()=>setMonth(new Date(month.getFullYear(),month.getMonth()-1,1))}>←</button><h2>{month.toLocaleDateString(undefined,{month:"long",year:"numeric"})}</h2><button onClick={()=>setMonth(new Date(month.getFullYear(),month.getMonth()+1,1))}>→</button></div><div className="weekdays">{["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d=><span key={d}>{d}</span>)}</div><div className="calendar-grid">{cells.map((day,i)=><div className="calendar-day" key={i}>{day&&<><strong>{day}</strong>{taskForDay(day).map(t=><button className={`calendar-task ${t.completed?"done":""}`} key={t._id} onClick={()=>setSelected(t)}>{t.title}</button>)}</>}</div>)}</div></section>{selected&&<div className="modal-backdrop" onClick={()=>setSelected(null)}><article className="confirm-modal task-modal" onClick={e=>e.stopPropagation()}><button className="modal-close" onClick={()=>setSelected(null)}>×</button><span className={`priority priority-${selected.priority.toLowerCase()}`}>{selected.priority.toUpperCase()}</span><h2>{selected.title}</h2><p>{selected.description||"No description added."}</p><p><strong>{selected.subject}</strong> · {formatDate(selected.dueDate)}</p></article></div>}</>};export default Planner;

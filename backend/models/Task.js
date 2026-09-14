@@ -7,6 +7,12 @@ const taskSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    description: {
+      type: String,
+      trim: true,
+      default: "",
+      maxlength: 500,
+    },
     subject: {
       type: String,
       required: true,
@@ -17,6 +23,14 @@ const taskSchema = new mongoose.Schema(
       required: true,
       enum: ["Low", "Medium", "High"],
       default: "Medium",
+    },
+    dueDate: {
+      type: Date,
+      default: null,
+    },
+    completed: {
+      type: Boolean,
+      default: false,
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,

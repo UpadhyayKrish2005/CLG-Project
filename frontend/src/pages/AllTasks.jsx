@@ -1,18 +1,2 @@
-import React from "react";
-import TaskManager from "../components/TaskManager.jsx";
-
-const AllTasks = () => {
-  return (
-    <>
-      <section className="app-header">
-        <p className="eyebrow">Saved Tasks</p>
-        <h1>All Study Tasks</h1>
-        <p className="subtitle">View, edit, and delete all tasks stored in MongoDB.</p>
-      </section>
-
-      <TaskManager view="list" />
-    </>
-  );
-};
-
-export default AllTasks;
+import React, { useEffect, useMemo, useState } from "react"; import { toast } from "react-toastify"; import api from "../api"; import { TaskCard } from "../components/TaskManager"; import { dateInputValue } from "../taskUtils";
+const AllTasks=()=>{const[tasks,setTasks]=useState([]),[loading,setLoading]=useState(true),[query,setQuery]=useState(""),[priority,setPriority]=useState("All"),[status,setStatus]=useState("All"),[sort,setSort]=useState("due");const load=()=>{setLoading(true);api.get("/tasks").then(r=>setTasks(r.data)).catch(()=>toast.error("Unable to load tasks.")).finally(()=>setLoading(false))};useEffect(load,[]);const displayed=useMemo(()=>tasks.filter(t=>(`${t.title} ${t.subject} ${t.description}`.toLowerCase().includes(query.toLowerCase()))&&(priority==="All"||t.priority===priority)&&(status==="All"||(status==="Completed"?t.completed:!t.completed))).sort((a,b)=>sort==="due"?(a.dueDate?new Date(a.dueDate):new Date("9999"))-(b.dueDate?new Date(b.dueDate):new Date("9999")):new Date(b.createdAt)-new Date(a.createdAt)),[tasks,query,priority,status,sort]);const update=async t=>{try{await api.put(`/tasks/${t._id}`,{...t,dueDate:dateInputValue(t.dueDate),completed:!t.completed});load()}catch{toast.error("Unable to update task.")}};const remove=async t=>{if(window.confirm(`Delete “${t.title}”?`)){try{await api.delete(`/tasks/${t._id}`);toast.success("Task deleted.");load()}catch{toast.error("Unable to delete task.")}}};return <><section className="app-header left-header"><p className="eyebrow">Task library</p><h1>All Study Tasks</h1><p className="subtitle">Search, organize, and update your academic work.</p></section><section className="card filters"><input placeholder="Search title, subject, or description" value={query} onChange={e=>setQuery(e.target.value)}/><select value={priority} onChange={e=>setPriority(e.target.value)}><option>All</option><option>High</option><option>Medium</option><option>Low</option></select><select value={status} onChange={e=>setStatus(e.target.value)}><option>All</option><option>Pending</option><option>Completed</option></select><select value={sort} onChange={e=>setSort(e.target.value)}><option value="due">Sort: Due date</option><option value="new">Sort: Newest</option></select></section>{loading?<p className="empty-state">Loading tasks…</p>:displayed.length?<div className="task-items all-task-list">{displayed.map(t=><TaskCard key={t._id} task={t} onToggle={update} onDelete={remove} onEdit={()=>toast.info("Edit tasks from the Planner page.")}/>)}</div>:<p className="empty-state">No tasks match these filters.</p>}</>};export default AllTasks;

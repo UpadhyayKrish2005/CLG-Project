@@ -10,6 +10,8 @@ import Register from "./pages/Register.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Planner from "./pages/Planner.jsx";
 import AllTasks from "./pages/AllTasks.jsx";
+import Analytics from "./pages/Analytics.jsx";
+import Profile from "./pages/Profile.jsx";
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
@@ -73,6 +75,8 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 

@@ -1,0 +1,3 @@
+export const formatDate = (value) => value ? new Date(`${String(value).slice(0, 10)}T00:00:00`).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }) : "No deadline";
+export const dateInputValue = (value) => (value ? String(value).slice(0, 10) : "");
+export const getTaskStats = (tasks) => { const completed = tasks.filter((task) => task.completed).length; const pending = tasks.length - completed; return { total: tasks.length, completed, pending, high: tasks.filter((task) => task.priority === "High").length, percentage: tasks.length ? Math.round((completed / tasks.length) * 100) : 0 }; };
