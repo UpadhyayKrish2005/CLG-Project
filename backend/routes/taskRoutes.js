@@ -40,7 +40,8 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
   try {
     const { title, description, subject, priority, dueDate, completed } = req.body;
-    const taskData = { title, description, subject, priority, dueDate: dueDate || null };
+    const taskData = { title, description, subject, priority };
+    if (dueDate !== undefined) taskData.dueDate = dueDate || null;
     if (typeof completed === "boolean") taskData.completed = completed;
     const updatedTask = await Task.findOneAndUpdate(
       { _id: req.params.id, user: req.user.id },

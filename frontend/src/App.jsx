@@ -12,6 +12,7 @@ import Planner from "./pages/Planner.jsx";
 import AllTasks from "./pages/AllTasks.jsx";
 import Analytics from "./pages/Analytics.jsx";
 import Profile from "./pages/Profile.jsx";
+import StudyAssistant from "./pages/StudyAssistant.jsx";
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
@@ -77,6 +78,7 @@ const App = () => {
         />
         <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/assistant" element={<ProtectedRoute><StudyAssistant /></ProtectedRoute>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 

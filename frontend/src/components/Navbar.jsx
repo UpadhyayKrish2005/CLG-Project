@@ -35,6 +35,7 @@ const Navbar = () => {
               All Tasks
             </NavLink>
             <NavLink to="/analytics" className={({ isActive }) => isActive ? "active" : ""}>Analytics</NavLink>
+            <NavLink to="/assistant" className={({ isActive }) => isActive ? "active" : ""}>AI Assistant</NavLink>
             <NavLink to="/profile" className={({ isActive }) => isActive ? "active" : ""}>Profile</NavLink>
             <span className="user-welcome">Hi, {user.name}!</span>
             <button type="button" onClick={handleLogout} className="logout-btn">
