@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://clg-project-lfie.onrender.com",
+  baseURL: "https://clg-project-lfie.onrender.com/api/auth/",
 });
 
 api.interceptors.request.use(
