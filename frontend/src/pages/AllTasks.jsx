@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import api from "../api";
 import { TaskCard } from "../components/TaskManager";
-import { dateInputValue } from "../taskUtils";
 
 const initialFilters = { query: "", subject: "All", priority: "All", status: "All", due: "All", sort: "due-asc" };
 const dayStart = (value) => { const date = new Date(value); date.setHours(0, 0, 0, 0); return date; };
@@ -30,7 +29,7 @@ const AllTasks = () => {
       return (a.dueDate ? new Date(a.dueDate).getTime() : Infinity) - (b.dueDate ? new Date(b.dueDate).getTime() : Infinity);
     });
   }, [tasks, filters]);
-  const update = async (task) => { try { await api.put(`/tasks/${task._id}`, { ...task, dueDate: dateInputValue(task.dueDate), completed: !task.completed }); await load(); } catch { toast.error("Unable to update task."); } };
+  const update = async (task) => { try { await api.delete(`/tasks/${task._id}`); setTasks((current) => current.filter((item) => item._id !== task._id)); toast.success("Task completed and removed."); } catch { toast.error("Unable to complete task."); } };
   const remove = async (task) => { if (!window.confirm(`Delete “${task.title}”?`)) return; try { await api.delete(`/tasks/${task._id}`); toast.success("Task deleted."); await load(); } catch { toast.error("Unable to delete task."); } };
   const set = (key) => (event) => setFilters((current) => ({ ...current, [key]: event.target.value }));
   return <><section className="app-header left-header"><p className="eyebrow">Task library</p><h1>All Study Tasks</h1><p className="subtitle">Search, organize, and update your academic work.</p></section>
